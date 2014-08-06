@@ -21,3 +21,14 @@ Default values
 date_format = yyyy-MM-dd<br>
 keep = 5<br>
 check_interval = 5m<br>
+
+
+Install
+=======
+
+- Build the project by this command:<br>
+<b>mvn assembly:assembly</b>
+
+- take the created jar file in the "target" directory, called "index-window-<version>-jar-with-dependencies.jar"
+
+- install the jar file as any other plugin on your Elasticsearch node
