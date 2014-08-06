@@ -17,14 +17,14 @@ import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.BaseRestHandler;
+import org.elasticsearch.rest.BytesRestResponse;
 import org.elasticsearch.rest.RestChannel;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.rest.XContentRestResponse;
-import org.elasticsearch.rest.XContentThrowableRestResponse;
-import org.elasticsearch.rest.action.support.RestXContentBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
@@ -122,18 +122,16 @@ public class IndexWindowAction extends BaseRestHandler {
                     keep, checkInterval.millis());
             addOrReplaceWindow(window);
 
-            final XContentBuilder builder = RestXContentBuilder
-                    .restContentBuilder(request);
+            final XContentBuilder builder = XContentFactory.contentBuilder(
+                    XContentType.JSON, channel.bytesOutput());
             builder.startObject();
             builder.field("acknowledge", true);
             builder.field("source", window);
             builder.endObject();
-            channel.sendResponse(new XContentRestResponse(request,
-                    RestStatus.OK, builder));
+            channel.sendResponse(new BytesRestResponse(RestStatus.OK, builder));
         } catch (final IOException e) {
             try {
-                channel.sendResponse(new XContentThrowableRestResponse(request,
-                        e));
+                channel.sendResponse(new BytesRestResponse(channel, e));
             } catch (final Exception ex) {
                 logger.error("Unknown problem occurred", ex);
             }
@@ -148,15 +146,15 @@ public class IndexWindowAction extends BaseRestHandler {
                 logger.info("index window removed: " + deleteIndex);
             }
             try {
-                final XContentBuilder builder = RestXContentBuilder
-                        .restContentBuilder(request);
+                final XContentBuilder builder = XContentFactory.contentBuilder(
+                        XContentType.JSON, channel.bytesOutput());
                 builder.startObject();
                 builder.field("acknowledge", true);
                 builder.field("found", found);
                 builder.field("deleted_index", deleteIndex);
                 builder.endObject();
-                channel.sendResponse(new XContentRestResponse(request,
-                        RestStatus.OK, builder));
+                channel.sendResponse(new BytesRestResponse(RestStatus.OK,
+                        builder));
             } catch (final IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -174,13 +172,13 @@ public class IndexWindowAction extends BaseRestHandler {
 
     private void respondBadRequest(RestRequest request, RestChannel channel,
             String message) throws IOException {
-        final XContentBuilder builder = RestXContentBuilder
-                .restContentBuilder(request);
+        final XContentBuilder builder = XContentFactory.contentBuilder(
+                XContentType.JSON, channel.bytesOutput());
         builder.startObject();
         builder.field("error", message);
         builder.endObject();
-        channel.sendResponse(new XContentRestResponse(request,
-                RestStatus.BAD_REQUEST, builder));
+        channel.sendResponse(new BytesRestResponse(RestStatus.BAD_REQUEST,
+                builder));
     }
 
     /**
@@ -286,7 +284,7 @@ public class IndexWindowAction extends BaseRestHandler {
     private boolean removeWindow(String indexPrefix) {
         boolean found = false;
         client.prepareDelete(META_INDEX, META_TYPE, indexPrefix).execute()
-                .actionGet();
+        .actionGet();
         final IndexWindowRunner removedWindow = activeWindows
                 .remove(indexPrefix);
         if (removedWindow != null) {
