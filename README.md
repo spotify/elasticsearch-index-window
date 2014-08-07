@@ -18,9 +18,9 @@ Delete the index window defined for indices with prefix "my-index_":<br>
 
 Default values
 ==============
-date_format = yyyy-MM-dd<br>
-keep = 5<br>
-check_interval = 5m<br>
+date_format = yyyy.MM.dd<br>
+keep = 7<br>
+check_interval = 30m<br>
 
 
 Install

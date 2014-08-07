@@ -42,9 +42,9 @@ public class IndexWindowAction extends BaseRestHandler {
     private static final String PARAM_INDEX_PREFIX = "index_prefix";
 
     private static final TimeValue DEFAULT_PARAM_CHECK_INTERVAL = new TimeValue(
-            5, TimeUnit.MINUTES);
-    private static final int DEFAULT_PARAM_KEEP = 5;
-    private static final String DEFAULT_PARAM_DATE_FORMAT = "yyyy-MM-dd";
+            30, TimeUnit.MINUTES);
+    private static final int DEFAULT_PARAM_KEEP = 7;
+    private static final String DEFAULT_PARAM_DATE_FORMAT = "yyyy.MM.dd";
 
     private static final long LOAD_RETRY_INTERVAL = 20000;
     private static final long LOAD_TIMEOUT = 200000;
