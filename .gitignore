@@ -5,4 +5,4 @@
 *.war
 *.ear
 /.settings/*
-/target/*
+/target
