@@ -123,7 +123,8 @@ public class IndexWindowRunner implements Runnable {
   private TreeSet<TimestampedIndex> getRelevantIndices(Set<String> allIndices) {
     TreeSet<TimestampedIndex> result = new TreeSet<TimestampedIndex>();
     String indexPrefix = window.getIndexPrefix();
-    SimpleDateFormat dateFormat = new SimpleDateFormat(window.getDateFormat());
+    String dateFormat = window.getDateFormat();
+    SimpleDateFormat dateFormatter = new SimpleDateFormat(dateFormat);
 
     for (String index : allIndices) {
       if (!index.startsWith(indexPrefix)) {
@@ -132,7 +133,12 @@ public class IndexWindowRunner implements Runnable {
 
       String indexDateStr = index.substring(indexPrefix.length(), index.length());
       try {
-        final Date indexDate = dateFormat.parse(indexDateStr);
+        Date indexDate;
+        if (dateFormat.isEmpty()) { // Assume unix timestamp
+          indexDate = new Date(Long.valueOf(dateFormat));
+        } else {
+          indexDate = dateFormatter.parse(indexDateStr);
+        }
         result.add(new TimestampedIndex(index, indexPrefix, indexDate));
       } catch (ParseException e) {
         // The timestamp does not match the date format, so we move on
