@@ -4,5 +4,6 @@
 *.jar
 *.war
 *.ear
+/.idea
 /.settings/*
 /target
